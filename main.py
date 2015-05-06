@@ -1,4 +1,5 @@
 import os, json
+import pandas as pd
 from oauth2client.client import SignedJwtAssertionCredentials
 from httplib2 import Http
 from googleapiclient.discovery import build
@@ -18,13 +19,31 @@ with open(filename) as ff:
 
 project = 'sacred-temple-93605'
 model_id = 'finishedModel' # id of model we want to use on Google Prediction
-credentials = SignedJwtAssertionCredentials(client_email, private_key,
+
+def make_prediction():
+    credentials = SignedJwtAssertionCredentials(client_email, private_key,
                                                     'https://www.googleapis.com/auth/prediction')
-http_auth = credentials.authorize(Http())
-service = build('prediction', 'v1.6', http=http_auth)
-result = service.trainedmodels().predict(project='sacred-temple-93605',
+    http_auth = credentials.authorize(Http())
+    service = build('prediction', 'v1.6', http=http_auth)
+    result = service.trainedmodels().predict(project='sacred-temple-93605',
                                                  id=model_id,
                                                  body={'input': {'csvInstance': ['hello']}}
                                         ).execute()
 
-print(result)
+    return result
+
+def get_testing_data(file_name='main_gold_etf_testing.csv'):
+    csv_instance_array = []
+    td = pd.read_csv(file_name)
+    for row in td.iterrows():
+        """ create a feature row in prediction API format
+        row[0]: index
+        row[1]: data
+        row[1][0]: date
+        row[1][1]: label
+        """
+        csv_instance_array.append(
+            {'label'   : row[1][1],
+                'features': list(row[1][2:])})
+
+
