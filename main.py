@@ -17,9 +17,14 @@ with open(filename) as ff:
 
 
 project = 'sacred-temple-93605'
+model_id = 'finishedModel' # id of model we want to use on Google Prediction
 credentials = SignedJwtAssertionCredentials(client_email, private_key,
                                                     'https://www.googleapis.com/auth/prediction')
 http_auth = credentials.authorize(Http())
 service = build('prediction', 'v1.6', http=http_auth)
-result = service.hostedmodels().predict(project='414649711441', hostedModelName='sample.sentiment', body={'input': {'csvInstance': ['sentiment testing is cool!']}}).execute()
+result = service.trainedmodels().predict(project='sacred-temple-93605',
+                                                 id=model_id,
+                                                 body={'input': {'csvInstance': ['hello']}}
+                                        ).execute()
+
 print(result)
