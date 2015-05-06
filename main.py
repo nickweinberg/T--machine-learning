@@ -8,8 +8,8 @@ from googleapiclient.discovery import build
 # get API key from environment variable
 # api_key = os.getenv('GOOGLE_API_KEY')
 # TODO: make environment variables or filename as cmd line arg
-filename= "stockprediction-66c922ad1bb7.json"
-with open(filename) as ff:
+secret_file = "stockprediction-66c922ad1bb7.json"
+with open(secret_file) as ff:
     f = json.loads(ff.read())
     private_key = f['private_key']
     client_email = f['client_email']
@@ -20,19 +20,21 @@ with open(filename) as ff:
 project = 'sacred-temple-93605'
 model_id = 'finishedModel' # id of model we want to use on Google Prediction
 
-def make_prediction():
+def make_prediction(features):
+    # features is list of features to pass to API
     credentials = SignedJwtAssertionCredentials(client_email, private_key,
                                                     'https://www.googleapis.com/auth/prediction')
     http_auth = credentials.authorize(Http())
     service = build('prediction', 'v1.6', http=http_auth)
     result = service.trainedmodels().predict(project='sacred-temple-93605',
                                                  id=model_id,
-                                                 body={'input': {'csvInstance': ['hello']}}
+                                                 body={'input': {'csvInstance': features}}
                                         ).execute()
 
     return result
 
-def get_testing_data(file_name='main_gold_etf_testing.csv'):
+
+def get_testing_data(file_name='data/main_gold_etf_testing.csv'):
     csv_instance_array = []
     td = pd.read_csv(file_name)
     for row in td.iterrows():
@@ -45,5 +47,11 @@ def get_testing_data(file_name='main_gold_etf_testing.csv'):
         csv_instance_array.append(
             {'label'   : row[1][1],
                 'features': list(row[1][2:])})
+    return csv_instance_array
+
+csv_instance_array = get_testing_data()
+features_to_test = csv_instance_array[100]
+print('Actual Label: ' + features_to_test['label'],
+      'Predicted Label: ' + make_prediction(features_to_test['features'])['outputLabel'])
 
 
