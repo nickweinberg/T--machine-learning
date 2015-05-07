@@ -1,4 +1,5 @@
 import os, json
+from sys import argv
 import pandas as pd
 from oauth2client.client import SignedJwtAssertionCredentials
 from httplib2 import Http
@@ -7,8 +8,7 @@ from googleapiclient.discovery import build
 
 # get API key from environment variable
 # api_key = os.getenv('GOOGLE_API_KEY')
-# TODO: make environment variables or filename as cmd line arg
-secret_file = "stockprediction-66c922ad1bb7.json"
+secret_file = argv[1]
 with open(secret_file) as ff:
     f = json.loads(ff.read())
     private_key = f['private_key']
@@ -49,9 +49,23 @@ def get_testing_data(file_name='data/main_gold_etf_testing.csv'):
                 'features': list(row[1][2:])})
     return csv_instance_array
 
-csv_instance_array = get_testing_data()
-features_to_test = csv_instance_array[100]
-print('Actual Label: ' + features_to_test['label'],
-      'Predicted Label: ' + make_prediction(features_to_test['features'])['outputLabel'])
 
+success_list = [0,0,0] # [correct prediction, incorrect, total guesses]
+csv_instance_array = get_testing_data()
+
+# curious to see how well model predicts on out of sample data
+
+features_to_test = csv_instance_array
+#print('Actual Label: ' + features_to_test['label'],
+#      'Predicted Label: ' + make_prediction(features_to_test['features'])['outputLabel'])
+for row in features_to_test:
+    actual = row['label']
+    predicted = make_prediction(row['features'])['outputLabel']
+    if actual == predicted:
+        success_list[0] += 1
+    else:
+        success_list[1] += 1
+    success_list[2] += 1
+
+print(success_list)
 
