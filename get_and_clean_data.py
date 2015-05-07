@@ -2,13 +2,7 @@ import numpy as np
 import pandas as pd
 import pandas.io.data as web
 import datetime
-import matplotlib.pyplot as plt
-import os, requests
 
-start = datetime.datetime(2010,1,1)
-end = datetime.datetime(2015,4,30)
-# get ticker data from yahoo finance
-f = web.DataReader("GLD", 'yahoo', start,end)
 
 def trendline(data, start, day, n):
     """ basic linear regression for trend line
@@ -89,5 +83,46 @@ def split_and_label(data):
     # eg. RoC15 will be NaN if we don't have data on 15 days prior
     dd = dd.dropna()
 
+def training_prediction_api_format(df, filename='main_training.csv'):
+    """ properly format to Prediction API then save file"""
+    cols = list(df) # list of columns
+    # dont need any of these features
+    col_to_del = ['Open', 'Adj Close', 'High', 'Low', 'Close', 'Volume', 'date']
+    keep = [col for col in cols if col not in col_to_del]
+    # move label to front for proper Prediction API format
+    keep.insert(0, keep.pop(keep.index('IsTomorrowUp')))
+    df = df.ix[:, keep] # reorder columns
+
+    # save without index or header
+    df.to_csv(filename, sep=',', header=False, index=False)
+    print('saved %s' % (filename))
+    return df
+
+def testing_prediction_api_format(df, filename='main_testing.csv'):
+    cols = list(df)
+    col_to_del = ['Open', 'Adj Close', 'High', 'Low', 'Close','Volume', 'date']
+    keep = [col for col in cols if col not in col_to_del]
+    keep.insert(0, keep.pop(keep.index('IsTomorrowUp')))
+    df = df.ix[:, keep]
+
+    df.to_csv(filename, sep=',')
+    print('saved %s' % (filename))
+    return df
+
+
+
+# TODO: grab start, end, ticker and nums array from system
+start = datetime.datetime(2010,1,1)
+end = datetime.datetime(2015,4,30)
+# get ticker data from yahoo finance
+f = web.DataReader("GLD", 'yahoo', start,end)
+
+updated_df = make_features(f, [2,5,15])
+# arbitrarily splitting training and testing data
+training_data = training_prediction_api_format(
+        split_and_label(updated_df[0:1100]))
+
+testing_data = testing_prediction_api_format(
+        split_and_label(updated_df[1100:]))
 
 
