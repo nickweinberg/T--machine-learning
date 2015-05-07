@@ -82,6 +82,7 @@ def split_and_label(data):
     # drops first n rows where n is largest n in nums
     # eg. RoC15 will be NaN if we don't have data on 15 days prior
     dd = dd.dropna()
+    return dd
 
 def training_prediction_api_format(df, filename='main_training.csv'):
     """ properly format to Prediction API then save file"""
@@ -124,5 +125,4 @@ training_data = training_prediction_api_format(
 
 testing_data = testing_prediction_api_format(
         split_and_label(updated_df[1100:]))
-
 

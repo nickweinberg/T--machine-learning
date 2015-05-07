@@ -1,4 +1,4 @@
-import os, json
+import json
 from sys import argv
 import pandas as pd
 from oauth2client.client import SignedJwtAssertionCredentials
@@ -34,7 +34,7 @@ def make_prediction(features):
     return result
 
 
-def get_testing_data(file_name='data/main_gold_etf_testing.csv'):
+def get_testing_data(file_name='data/main_testing.csv'):
     csv_instance_array = []
     td = pd.read_csv(file_name)
     for row in td.iterrows():
