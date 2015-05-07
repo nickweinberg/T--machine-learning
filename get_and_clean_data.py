@@ -55,3 +55,28 @@ def stochastic_oscillator(data, start, day, n=14):
     price = data['Adj Close'][day]
     K = ((price - L) / (H - L))
     return K
+
+def make_features(data, nums, start='20100104'):
+    """ takes a dataframe and appends features to each row.
+    nums is array of time periods we want each feature for."""
+    df = data # copy
+    # TODO: grab start date from first date of DF, instead of explicitly
+    df['date'] = df.index
+    for n in nums:
+        # slope of trendline for n in nums
+        df['trend_slope_'+str(n)] = df['date'].apply(
+                lambda day: trendline(data, start, day, n)[0])
+        # ROCn for each n in nums
+        df['RoC_'+str(n)] = df['date'].apply(
+                lambda day: rate_of_change(data, day, n))
+        # ROC1 / ROCm for m in nums
+        df['ratio_ROC_'+str(n)] = df['date'].apply(
+                lambda day: ratio_ROC(data, day, 1, n))
+
+        # value %K for period 14
+        df['%K-14'] = df['date'].apply(
+            lambda day: stochastic_oscillator(data, start, day))
+
+    return df
+
+
