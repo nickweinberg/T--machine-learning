@@ -52,7 +52,7 @@ def get_testing_data(file_name='data/main_testing.csv'):
                 'features': list(row[1][2:])})
     return csv_instance_array
 
-def get_prediction_for_testing_data():
+def get_predictions_for_testing_data():
     success_list = [0,0,0] # [correct prediction, incorrect, total guesses]
     csv_instance_array = get_testing_data()
 
