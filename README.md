@@ -11,4 +11,7 @@ the training data.
 
 In main.py the script gets credentials from a json file. It reads data we want to test from previously saved testing data. Then it connects to the Prediction API using credentials and passes the features (but not the actual label) returing a prediction.
 
-Since one prediction isn't particularly useful in this case there's an additional get_predictions_for_testing_data() function which gets a prediction for each row/day in testing data and logs which predictions were correct and which were not.  
+Since one prediction isn't particularly useful in this case there's an additional get_predictions_for_testing_data() function which gets a prediction for each row/day in testing data and logs which predictions were correct and which were not. 
+
+To run main.py, ex:
+`python main.py my_secret_keys.json`
