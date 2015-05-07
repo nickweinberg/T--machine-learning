@@ -59,7 +59,6 @@ def get_predictions_for_testing_data():
     # curious to see how well model predicts on out of sample data
     features_to_test = csv_instance_array
     for row in features_to_test:
-        time.sleep(2) # getting 500 errors maybe slowing down calls will help
         actual = row['label']
         predicted = make_prediction(row['features'])['outputLabel']
         if actual == predicted:
@@ -71,11 +70,15 @@ def get_predictions_for_testing_data():
     # save results for later
     file_name = 'results_' + str(time.time()) +'.txt'
     with open(file_name, 'w') as f:
-            f.write(str(success_list))
+        result_str = 'Correct: '+str(success_list[0])+'\nIncorrect: ' + str(success_list[1])+'\nTotal: ' + str(success_list[2])+ '\n'
+
+        f.write(result_str)
 
 
-features_to_test = get_testing_data()[10] # arbitrarily testing 10th row
+#features_to_test = get_testing_data()[10] # arbitrarily testing 10th row
 
-
+"""
 print('Actual Label: ' + features_to_test['label'],
       'Predicted Label: ' + make_prediction(features_to_test['features'])['outputLabel'])
+"""
+get_predictions_for_testing_data()
