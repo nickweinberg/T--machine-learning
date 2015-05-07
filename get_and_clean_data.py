@@ -23,7 +23,7 @@ def trendline(data, start, day, n):
     xi = np.arange(last_n.shape[0])
     A = np.array([ xi, np.ones(last_n.shape[0])])
     w = np.linalg.lstsq(A.T, y)[0]
-    line = w[0] * xi + w[1]
+    # line = w[0] * xi + w[1]
 
     return w # slope w[0]
 
@@ -78,5 +78,16 @@ def make_features(data, nums, start='20100104'):
             lambda day: stochastic_oscillator(data, start, day))
 
     return df
+
+def split_and_label(data):
+    dd = data
+    dd['IsTomorrowUp'] = dd['Adj Close'].shift(-1) > dd['Adj Close']
+    # turn into text label
+    dd['IsTomorrowUp'] = dd['IsTomorrowUp'].apply(
+            lambda label: 'UP' if label else 'DOWN')
+    # drops first n rows where n is largest n in nums
+    # eg. RoC15 will be NaN if we don't have data on 15 days prior
+    dd = dd.dropna()
+
 
 
